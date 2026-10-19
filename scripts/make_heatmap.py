@@ -17,7 +17,9 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 from config import load  # noqa: E402
 
-_CFG = load()["heatmap"]
+_FULL_CFG = load()
+USERNAME = _FULL_CFG.get("github_username", "")
+_CFG = _FULL_CFG["heatmap"]
 TOTAL = int(_CFG["total"])         # contributions shown for the year (profile.json -> heatmap.total)
 SEED = int(_CFG["seed"])           # change for a different pattern
 END = _CFG["end"]                  # last day on the graph (profile.json -> heatmap.end_date, blank = today)
@@ -25,7 +27,42 @@ LEVELS = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353", "#7cffcb"]  # n
 FONT = "-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"
 
 
+def fetch_real_data(username):
+    import urllib.request
+    import re
+    url = f"https://github.com/users/{username}/contributions"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    html = urllib.request.urlopen(req, timeout=15).read().decode("utf-8")
+    items = re.findall(r'data-date="(\d{4}-\d{2}-\d{2})"\s+id="([^"]+)"', html)
+    tips = dict(re.findall(r'for="([^"]+)"[^>]*>([^<]+)</tool-tip>', html))
+    counts_by_date = {}
+    for d_str, cid in items:
+        tip = tips.get(cid, '')
+        m = re.search(r'(\d+)\s+contribution', tip)
+        c = int(m.group(1)) if m else 0
+        counts_by_date[dt.date.fromisoformat(d_str)] = c
+
+    all_dates = sorted(counts_by_date.keys())
+    if not all_dates:
+        return None
+    start_date, end_date = all_dates[0], all_dates[-1]
+    result = []
+    curr = start_date
+    while curr <= end_date:
+        result.append((curr, counts_by_date.get(curr, 0)))
+        curr += dt.timedelta(days=1)
+    return result
+
+
 def make_data():
+    if USERNAME:
+        try:
+            real = fetch_real_data(USERNAME)
+            if real:
+                return real
+        except Exception as e:
+            print(f"Warning: could not fetch live contributions ({e}), generating from config")
+
     rnd = random.Random(SEED)
     start = END - dt.timedelta(days=END.weekday() + 1 + 52 * 7)   # a Sunday, 53 columns back
     n = (END - start).days + 1
@@ -80,6 +117,8 @@ def stats(data):
 def level(c, mx):
     if c == 0:
         return 0
+    if mx <= 4:
+        return min(5, c)
     q = c / mx
     return 1 if q < .15 else 2 if q < .32 else 3 if q < .55 else 4 if q < .8 else 5
 
@@ -147,6 +186,6 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "data"), exist_ok=True)
     os.makedirs(os.path.join(ROOT, "assets"), exist_ok=True)
     json.dump({"stats": st, "days": [[d.isoformat(), c] for d, c in data]},
-              open(os.path.join(ROOT, "data", "contributions.json"), "w"), indent=1)
-    open(os.path.join(ROOT, "assets", "contrib-heatmap.svg"), "w").write(svg(data, st))
+              open(os.path.join(ROOT, "data", "contributions.json"), "w", encoding="utf-8"), indent=1)
+    open(os.path.join(ROOT, "assets", "contrib-heatmap.svg"), "w", encoding="utf-8").write(svg(data, st))
     print("wrote assets/contrib-heatmap.svg", st)

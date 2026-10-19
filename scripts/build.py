@@ -46,8 +46,7 @@ def readme(cfg):
     u, h = cfg["github_username"], cfg["handle"]
     links = "\n".join(badge(k, v) for k, v in cfg.get("links", {}).items() if k in BADGES and str(v).strip())
     snake = f"https://raw.githubusercontent.com/{u}/{u}/output"
-    credit = "" if u.lower() == "gubreleysanskar" else \
-        '\n<sub>Profile template by <a href="https://github.com/GubreleySanskar">@GubreleySanskar</a></sub>\n'
+    credit = ""
 
     return f"""<div align="center">
 

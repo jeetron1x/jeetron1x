@@ -32,7 +32,8 @@ W = 490
 
 
 def stats():
-    st = json.load(open(os.environ.get("CONTRIB_JSON") or os.path.join(ROOT, "data", "contributions.json")))["stats"]
+    path = os.environ.get("CONTRIB_JSON") or os.path.join(ROOT, "data", "contributions.json")
+    st = json.load(open(path, encoding="utf-8"))["stats"]
     return [(f'{st["total"]:,}', "contributions"), (f'{st["longest_streak"]}d', "longest streak"),
             (f'{st["current_streak"]}d', "current streak"), (str(st["active_days"]), "active days")]
 
@@ -122,10 +123,10 @@ if __name__ == "__main__":
     h = 470
     p = os.path.join(ROOT, "assets", "ascii-portrait.svg")
     if os.path.exists(p):
-        m = re.search(r'height="(\d+)"', open(p).read())
+        m = re.search(r'height="(\d+)"', open(p, encoding="utf-8").read())
         h = int(m.group(1)) if m else h
     svg, need = card(h)
     if need > h:                       # content taller than the portrait: grow to fit
         svg, _ = card(need)
-    open(os.path.join(ROOT, "assets", "info-card.svg"), "w").write(svg)
+    open(os.path.join(ROOT, "assets", "info-card.svg"), "w", encoding="utf-8").write(svg)
     print("wrote assets/info-card.svg, height", max(h, need))

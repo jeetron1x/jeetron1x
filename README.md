@@ -39,6 +39,4 @@
 
 <br>
 
-<sub>Profile template by <a href="https://github.com/GubreleySanskar">@GubreleySanskar</a></sub>
-
 </div>
