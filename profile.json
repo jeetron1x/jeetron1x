@@ -1,0 +1,28 @@
+{
+  "github_username": "jeetron1x",
+  "handle": "jeet",
+  "name": "Jeet Kumar Sarkar",
+  "tagline": "CS Student",
+
+  "now": { "role": "First Year CS Student", "where": "@ ITER, Bhubaneswar" },
+  "creating": "Platforms that make our life efficient and safe",
+  "stack": ["Java", "HTML", "CSS", "JavaScript", "Node.js", "C#", "Python", "Git"],
+  "highlights": [
+    "Building tools that make everyday life efficient & safe",
+    "First-year CS student diving into full-stack development",
+    "Passionate about clean code & creative problem-solving"
+  ],
+
+  "headline": "CS Student @ ITER, Bhubaneswar · Aspiring Full-Stack Developer",
+  "links": {
+    "email": "",
+    "instagram": "jeetu.sfx",
+    "linkedin": "jeet-kumar-sarkar-329656418",
+    "x": "",
+    "youtube": "",
+    "website": "https://jeetron1x-landing-page.vercel.app/"
+  },
+
+  "heatmap": { "total": 150, "seed": 29, "end_date": "" },
+  "portrait": { "crop": "" }
+}
